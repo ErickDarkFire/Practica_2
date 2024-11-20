@@ -3,6 +3,10 @@
 #include <stdlib.h>
 
 // Jorge Sebastian Sanchez Arana | Erick Eduardo Rodriguez Gomez | 19/11/2024
+//git add nombre
+//Mensaje: 
+//git commit
+//git Push / git sinh
 
 #define FRUIT_COLOR 0xFF0000 // Rojo
 #define SNAKE_COLOR 0x00FF00 // Verde
