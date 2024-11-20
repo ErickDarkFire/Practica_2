@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-// Jorge Sebastian Sanchez Arana | Erick Eduardo Rodriguez Gomez
+// Jorge Sebastian Sanchez Arana | Erick Eduardo Rodriguez Gomez | 19/11/2024
 
 #define FRUIT_COLOR 0xFF0000 // Rojo
 #define SNAKE_COLOR 0x00FF00 // Verde
