@@ -18,6 +18,9 @@ volatile unsigned int *d_pad_down = D_PAD_0_DOWN;
 volatile unsigned int *d_pad_left = D_PAD_0_LEFT;
 volatile unsigned int *d_pad_right = D_PAD_0_RIGHT;
 
+// Swicth para reiniciar
+volatile unsigned* switch_restart = SWITCHES_0_BASE;
+
 // LED Matrix
 volatile unsigned int *led_base = LED_MATRIX_0_BASE;
 
@@ -109,10 +112,16 @@ bool update_snake_position()
         snake_length++; // Incrementar longitud
         fruit.x = rand() % board_width;
         fruit.y = rand() % board_height;
-        if(fruit.x %2 != 0) fruit.x+=1;
-        if(fruit.y %2 != 0) fruit.y+=1;
+        if(fruit.x %2 != 0){
+            if(fruit.x < board_width-1) fruit.x+=1;
+            else fruit.x-=1;
+        }
+        if(fruit.y %2 != 0){
+            if(fruit.y < board_height-1) fruit.y+=1;
+            else fruit.y-=1;
+        }
+        //printf("Ubicacion: (%d , %d) \n",fruit.x,fruit.y);
     }
-
     return true;
 }
 
@@ -123,25 +132,25 @@ void read_input()
     {
         dir_x = 0;
         dir_y = -2;
-        printf("Sube\n");
+        //printf("Sube\n");
     }
     if (*d_pad_down && dir_y == 0)
     {
         dir_x = 0;
         dir_y = 2;
-        printf("Baja\n");
+        //printf("Baja\n");
     }
     if (*d_pad_left && dir_x == 0)
     {
         dir_x = -2;
         dir_y = 0;
-        printf("Izquierda\n");
+        //printf("Izquierda\n");
     }
     if (*d_pad_right && dir_x == 0)
     {
         dir_x = 2;
         dir_y = 0;
-        printf("Derecha\n");
+        //printf("Derecha\n");
     }
 }
 
@@ -164,31 +173,54 @@ void setup_game(int n)
     fruit.x = rand() % board_width;
     fruit.y = rand() % board_height;
     //evitamos que la manzana aparezca en una posicion impar y se desfase del snake
-    if(fruit.x %2 != 0) fruit.x+=1;
-    if(fruit.y %2 != 0) fruit.y+=1;
+    if(fruit.x %2 != 0){
+            if(fruit.x < board_width-1) fruit.x+=1;
+            else fruit.x-=1;
+        }
+    if(fruit.y %2 != 0){
+        if(fruit.y < board_height-1) fruit.y+=1;
+        else fruit.y-=1;
+    }
 }
 
 // Main del juego
 void main()
 {
     int n = 40; // Cambia este valor para modificar el tamaño del tablero
+    while(1){
     setup_game(n);
-
-    while (1)
-    {
-        read_input(); // Leer movimientos del usuario
-        if (!update_snake_position())
+        while (1)
         {
-            break; // Terminar el juego si hay colisión
+            read_input(); // Leer movimientos del usuario
+            if (!update_snake_position())
+            {
+                break; // Terminar el juego si hay colisión
+            }
+            draw_board(); // Dibujar el tablero
+            //evaluar si el switch 0 esta encendido
+            if ((*switch_restart >> 0) & 0x1) {
+                for (int i = 0; i < 10000; i++);
+                break;
+            }
+            //podria usarse un goto para reiniciar el juego
+            //parar el tiempo con el switch 1
+            while((*switch_restart >> 1) & 0x1) {
+                //espera xd
+            }
         }
-        draw_board(); // Dibujar el tablero
-    }
-
-    // Fin del juego
-    for (int i = 0; i < board_width * board_height; i++)
-    {
-        *(led_base + i) = 0xFF0000; // Rellenar matriz LED en rojo
-    }
-
+        // Fin del juego
+        for (int i = 0; i < board_width * board_height; i++)
+        {
+            *(led_base + i) = 0xFF0000; // Rellenar matriz LED en rojo
+        }
     free(snake); // Liberar memoria
+
+    while(1){
+        //evaluar si el switch 0 esta encendido
+        if ((*switch_restart >> 0) & 0x1) {
+            break;
+        }
+        for (int i = 0; i < 10000; i++);
+    }
+    }
 }
