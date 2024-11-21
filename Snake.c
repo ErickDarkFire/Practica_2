@@ -19,7 +19,7 @@ volatile unsigned int *d_pad_left = D_PAD_0_LEFT;
 volatile unsigned int *d_pad_right = D_PAD_0_RIGHT;
 
 // Swicth para reiniciar
-volatile unsigned* switch_restart = SWITCHES_0_BASE;
+volatile unsigned* switch_base = SWITCHES_0_BASE;
 
 // LED Matrix
 volatile unsigned int *led_base = LED_MATRIX_0_BASE;
@@ -42,6 +42,35 @@ Point fruit;      // Posición de la fruta
 // Variables de dirección
 int dir_x = 0;
 int dir_y = -2;
+
+//funcion para obtener las posiciones validas del tablero para colocar la fruta
+bool is_position_occupied_by_snake(int x, int y) {
+    for (int i = 0; i < snake_length; i++) {
+        if (snake[i].x == x && snake[i].y == y) {
+            return true; // La posición está ocupada por la serpiente
+        }
+    }
+    return false; // La posición está libre
+}
+
+//Generacion de una nueva posicion de la fruta:
+void generate_fruit_position() {
+    do {
+        fruit.x = rand() % board_width;
+        fruit.y = rand() % board_height;
+
+        // Asegurarse de que las coordenadas sean pares
+        if (fruit.x % 2 != 0) {
+            if (fruit.x < board_width - 1) fruit.x += 1;
+            else fruit.x -= 1;
+        }
+        if (fruit.y % 2 != 0) {
+            if (fruit.y < board_height - 1) fruit.y += 1;
+            else fruit.y -= 1;
+        }
+        //printf("Ubicacion: (%d , %d) \n",fruit.x,fruit.y);
+    } while (is_position_occupied_by_snake(fruit.x, fruit.y)); // Repetir si la posición está ocupada
+}
 
 // Inicializar tablero
 void draw_board()
@@ -110,17 +139,7 @@ bool update_snake_position()
     if (new_x == fruit.x && new_y == fruit.y)
     {
         snake_length++; // Incrementar longitud
-        fruit.x = rand() % board_width;
-        fruit.y = rand() % board_height;
-        if(fruit.x %2 != 0){
-            if(fruit.x < board_width-1) fruit.x+=1;
-            else fruit.x-=1;
-        }
-        if(fruit.y %2 != 0){
-            if(fruit.y < board_height-1) fruit.y+=1;
-            else fruit.y-=1;
-        }
-        //printf("Ubicacion: (%d , %d) \n",fruit.x,fruit.y);
+        generate_fruit_position();
     }
     return true;
 }
@@ -170,17 +189,7 @@ void setup_game(int n)
     if(snake[0].y %2 != 0) snake[0].y +=1;
 
     // Inicializar fruta
-    fruit.x = rand() % board_width;
-    fruit.y = rand() % board_height;
-    //evitamos que la manzana aparezca en una posicion impar y se desfase del snake
-    if(fruit.x %2 != 0){
-            if(fruit.x < board_width-1) fruit.x+=1;
-            else fruit.x-=1;
-        }
-    if(fruit.y %2 != 0){
-        if(fruit.y < board_height-1) fruit.y+=1;
-        else fruit.y-=1;
-    }
+    generate_fruit_position();
 }
 
 // Main del juego
@@ -198,13 +207,13 @@ void main()
             }
             draw_board(); // Dibujar el tablero
             //evaluar si el switch 0 esta encendido
-            if ((*switch_restart >> 0) & 0x1) {
+            if ((*switch_base >> 0) & 0x1) {
                 for (int i = 0; i < 10000; i++);
                 break;
             }
             //podria usarse un goto para reiniciar el juego
             //parar el tiempo con el switch 1
-            while((*switch_restart >> 1) & 0x1) {
+            while((*switch_base >> 1) & 0x1) {
                 //espera xd
             }
         }
@@ -217,7 +226,7 @@ void main()
 
     while(1){
         //evaluar si el switch 0 esta encendido
-        if ((*switch_restart >> 0) & 0x1) {
+        if ((*switch_base >> 0) & 0x1) {
             break;
         }
         for (int i = 0; i < 10000; i++);
