@@ -8,8 +8,8 @@
 //git commit
 //git Push / git sinh
 
-#define FRUIT_COLOR 0xFF0000 // Rojo
-#define SNAKE_COLOR 0x00FF00 // Verde
+#define FRUIT_COLOR 0x00FF00 // Verde
+#define SNAKE_COLOR 0xFF0000 // Rojo
 #define EMPTY_COLOR 0x000000 // Negro
 
 // D-Pad para movimiento
@@ -38,7 +38,7 @@ Point fruit;      // Posición de la fruta
 
 // Variables de dirección
 int dir_x = 0;
-int dir_y = -1;
+int dir_y = -2;
 
 // Inicializar tablero
 void draw_board()
@@ -47,7 +47,7 @@ void draw_board()
     {
         for (int x = 0; x < board_width; x++)
         {
-            *(led_base + y * board_width + x) = EMPTY_COLOR;
+            *(led_base + ((y * board_width) + x)) = EMPTY_COLOR;
         }
     }
 
@@ -55,16 +55,17 @@ void draw_board()
     for (int i = 0; i < 2; i++)
     {
         *(led_base + fruit.y * board_width + fruit.x + i) = FRUIT_COLOR;
+        *(led_base + (fruit.y + 1) * board_width + fruit.x + i) = FRUIT_COLOR;
     }
 
     // Dibujar serpiente
     for (int i = 0; i < snake_length; i++)
     {
         *(led_base + snake[i].y * board_width + snake[i].x) = SNAKE_COLOR;
-        // *(led_base + snake[i].y+1 * board_width + snake[i].x) = SNAKE_COLOR;
-        // *(led_base + snake[i].y * board_width + snake[i].x+1) = SNAKE_COLOR;
-        // *(led_base + snake[i].y+1 * board_width + snake[i].x+1) = SNAKE_COLOR;
-        *(led_base + i * board_width) = SNAKE_COLOR;
+        *(led_base + (snake[i].y+1) * board_width + snake[i].x) = SNAKE_COLOR;
+        *(led_base + snake[i].y * board_width + snake[i].x+1) = SNAKE_COLOR;
+        *(led_base + (snake[i].y+1) * board_width + (snake[i].x+1)) = SNAKE_COLOR;
+        // *(led_base + i * board_width) = SNAKE_COLOR;
     }
 
     for (int i = 0; i < 8000; i++);
@@ -108,6 +109,8 @@ bool update_snake_position()
         snake_length++; // Incrementar longitud
         fruit.x = rand() % board_width;
         fruit.y = rand() % board_height;
+        if(fruit.x %2 != 0) fruit.x+=1;
+        if(fruit.y %2 != 0) fruit.y+=1;
     }
 
     return true;
@@ -119,24 +122,24 @@ void read_input()
     if (*d_pad_up && dir_y == 0)
     {
         dir_x = 0;
-        dir_y = -1;
+        dir_y = -2;
         printf("Sube\n");
     }
     if (*d_pad_down && dir_y == 0)
     {
         dir_x = 0;
-        dir_y = 1;
+        dir_y = 2;
         printf("Baja\n");
     }
     if (*d_pad_left && dir_x == 0)
     {
-        dir_x = -1;
+        dir_x = -2;
         dir_y = 0;
         printf("Izquierda\n");
     }
     if (*d_pad_right && dir_x == 0)
     {
-        dir_x = 1;
+        dir_x = 2;
         dir_y = 0;
         printf("Derecha\n");
     }
@@ -153,10 +156,16 @@ void setup_game(int n)
     snake_length = 1;
     snake[0].x = board_width / 2;
     snake[0].y = board_height / 2;
+    //evitamos que la snake aparezca en una posicion impar
+    if(snake[0].x %2 != 0) snake[0].x +=1;
+    if(snake[0].y %2 != 0) snake[0].y +=1;
 
     // Inicializar fruta
     fruit.x = rand() % board_width;
     fruit.y = rand() % board_height;
+    //evitamos que la manzana aparezca en una posicion impar y se desfase del snake
+    if(fruit.x %2 != 0) fruit.x+=1;
+    if(fruit.y %2 != 0) fruit.y+=1;
 }
 
 // Main del juego
