@@ -67,8 +67,7 @@ void draw_board()
         *(led_base + i * board_width) = SNAKE_COLOR;
     }
 
-    for (int i = 0; i < 8000; i++)
-        ;
+    for (int i = 0; i < 8000; i++);
 }
 
 // Actualizar posición de la serpiente
