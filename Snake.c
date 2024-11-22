@@ -1,12 +1,11 @@
+//Rodriguez Gomez Erick Eduardo - 753535
+//Sanchez Arana Jorge Sebastian - 753517
+//Organizacion Y Arquitectura de Computadoras
+//ITESO Universidad Jesuita de Guadalajara
+//21/11/2024
 #include "ripes_system.h"
 #include <stdbool.h>
 #include <stdlib.h>
-
-// Jorge Sebastian Sanchez Arana | Erick Eduardo Rodriguez Gomez | 19/11/2024
-//git add nombre
-//Mensaje: 
-//git commit
-//git Push / git sinh
 
 #define FRUIT_COLOR 0x00FF00 // Verde
 #define SNAKE_COLOR 0xFF0000 // Rojo
