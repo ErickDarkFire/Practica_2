@@ -174,10 +174,10 @@ void read_input()
 }
 
 // Configurar juego
-void setup_game(int n)
+void setup_game(int w,int h)
 {
-    board_width = n;
-    board_height = n;
+    board_width = w;
+    board_height = h;
 
     // Inicializar posiciones iniciales de la serpiente
     snake = (Point *)malloc(board_width * board_height * sizeof(Point));
@@ -195,9 +195,10 @@ void setup_game(int n)
 // Main del juego
 void main()
 {
-    int n = 40; // Cambia este valor para modificar el tamaño del tablero
+    int wi = LED_MATRIX_0_WIDTH;
+    int he = LED_MATRIX_0_HEIGHT;
     while(1){
-    setup_game(n);
+    setup_game(wi,he);
         while (1)
         {
             read_input(); // Leer movimientos del usuario
