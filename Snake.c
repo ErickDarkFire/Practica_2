@@ -75,14 +75,6 @@ void generate_fruit_position() {
 // Inicializar tablero
 void draw_board()
 {
-    for (int y = 0; y < board_height; y++)
-    {
-        for (int x = 0; x < board_width; x++)
-        {
-            *(led_base + ((y * board_width) + x)) = EMPTY_COLOR;
-        }
-    }
-
     // Dibujar fruta
     for (int i = 0; i < 2; i++)
     {
@@ -100,12 +92,28 @@ void draw_board()
         // *(led_base + i * board_width) = SNAKE_COLOR;
     }
 
-    for (int i = 0; i < 8000; i++);
+    for (int i = 0; i < 10000; i++);
+}
+
+void black_cls(){
+    for (int y = 0; y < board_height; y++)
+    {
+        for (int x = 0; x < board_width; x++)
+        {
+            *(led_base + ((y * board_width) + x)) = EMPTY_COLOR;
+        }
+    }
 }
 
 // Actualizar posición de la serpiente
 bool update_snake_position()
 {
+        //eliminamos la cola para poder dibujar el desplazamiento
+        *(led_base + snake[snake_length-1].y * board_width + snake[snake_length-1].x) = EMPTY_COLOR;
+        *(led_base + (snake[snake_length-1].y+1) * board_width + snake[snake_length-1].x) = EMPTY_COLOR;
+        *(led_base + snake[snake_length-1].y * board_width + snake[snake_length-1].x+1) = EMPTY_COLOR;
+        *(led_base + (snake[snake_length-1].y+1) * board_width + (snake[snake_length-1].x+1)) = EMPTY_COLOR; 
+
     // Nueva cabeza
     int new_x = snake[0].x + dir_x;
     int new_y = snake[0].y + dir_y;
@@ -125,6 +133,7 @@ bool update_snake_position()
         }
     }
 
+    
     // Mover cuerpo: desplazar cada segmento al lugar del anterior
     for (int i = snake_length - 1; i > 0; i--)
     {
@@ -181,7 +190,7 @@ void setup_game(int w,int h)
 
     // Inicializar posiciones iniciales de la serpiente
     snake = (Point *)malloc(board_width * board_height * sizeof(Point));
-    snake_length = 1;
+    snake_length = 2;
     snake[0].x = board_width / 2;
     snake[0].y = board_height / 2;
     //evitamos que la snake aparezca en una posicion impar
@@ -199,8 +208,10 @@ void main()
     int he = LED_MATRIX_0_HEIGHT;
     while(1){
     setup_game(wi,he);
+    black_cls();
         while (1)
         {
+            
             read_input(); // Leer movimientos del usuario
             if (!update_snake_position())
             {
